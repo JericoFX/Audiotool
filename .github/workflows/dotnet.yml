@@ -25,13 +25,13 @@ jobs:
     - name: Test
       run: dotnet test --no-build --verbosity normal
     - name: Create ZIP file
-      run: zip -r output.zip .
+      run: zip -r "${{ github.repository }}.zip" . # Crea un archivo ZIP con el nombre del repositorio
     - name: Upload Release Asset
       uses: actions/upload-release-asset@v1
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Utiliza el GITHUB_TOKEN automáticamente proporcionado
       with:
         upload_url: ${{ github.event.release.upload_url }}
-        asset_path: ./output.zip
-        asset_name: output.zip
+        asset_path: ./${{ github.repository }}.zip # Ruta del archivo ZIP creado
+        asset_name: ${{ github.repository }}.zip # Nombre del archivo ZIP
         asset_content_type: application/zip
