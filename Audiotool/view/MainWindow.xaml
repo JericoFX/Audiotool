@@ -5,94 +5,200 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Audiotool"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="{Binding WindowTitle}" Height="600" Width="900"
+        Background="#F0F0F0">
+    <Window.Resources>
+        <Style TargetType="Button">
+            <Setter Property="Padding" Value="12,6"/>
+            <Setter Property="Margin" Value="5"/>
+            <Setter Property="Background" Value="#3498db"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" 
+                                CornerRadius="4"
+                                BorderThickness="{TemplateBinding BorderThickness}" 
+                                BorderBrush="{TemplateBinding BorderBrush}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#2980b9"/>
+                </Trigger>
+                <Trigger Property="IsEnabled" Value="False">
+                    <Setter Property="Background" Value="#bdc3c7"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        
+        <Style TargetType="TextBox">
+            <Setter Property="Padding" Value="8,4"/>
+            <Setter Property="Margin" Value="0,5"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="BorderBrush" Value="#bdc3c7"/>
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TextBox">
+                        <Border Background="{TemplateBinding Background}" 
+                                CornerRadius="4"
+                                BorderThickness="{TemplateBinding BorderThickness}" 
+                                BorderBrush="{TemplateBinding BorderBrush}">
+                            <ScrollViewer x:Name="PART_ContentHost"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        
+        <Style TargetType="DataGrid">
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="BorderBrush" Value="#bdc3c7"/>
+            <Setter Property="RowBackground" Value="White"/>
+            <Setter Property="AlternatingRowBackground" Value="#f5f5f5"/>
+            <Setter Property="HorizontalGridLinesBrush" Value="#e0e0e0"/>
+            <Setter Property="VerticalGridLinesBrush" Value="#e0e0e0"/>
+        </Style>
+    </Window.Resources>
+    
     <DockPanel>
-        <Menu DockPanel.Dock="top"/>
-        <Grid>
+        <Menu DockPanel.Dock="Top" Background="#2c3e50" Foreground="White">
+            <MenuItem Header="File" Foreground="White">
+                <MenuItem Header="New Project" Command="{Binding NewProjectCommand}"/>
+                <MenuItem Header="Open Project" Command="{Binding OpenProjectCommand}"/>
+                <MenuItem Header="Save Project" Command="{Binding SaveProjectCommand}"/>
+                <MenuItem Header="Save Project As..." Command="{Binding SaveProjectAsCommand}"/>
+                <Separator/>
+                <MenuItem Header="Exit" Click="ExitMenuItem_Click"/>
+            </MenuItem>
+            <MenuItem Header="Tools" Foreground="White">
+                <MenuItem Header="Build Resource" Command="{Binding ExportCommand}"/>
+            </MenuItem>
+            <MenuItem Header="Help" Foreground="White">
+                <MenuItem Header="About" Click="AboutMenuItem_Click"/>
+            </MenuItem>
+        </Menu>
+        
+        <Grid Margin="10">
             <Grid.RowDefinitions>
-                <RowDefinition Height="30" />
-                <RowDefinition Height="10*" />
-                <RowDefinition Height="1*" />
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="147*" MaxWidth="200"/>
-                <ColumnDefinition Width="207*" MaxWidth="200"/>
-                <ColumnDefinition Width="53*" MaxWidth="200"/>
-                <ColumnDefinition Width="247*" MaxWidth="300"/>
-                <ColumnDefinition Width="146*" />
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="280"/>
             </Grid.ColumnDefinitions>
-
-            <TextBlock 
-                Text="Sound List" 
-                VerticalAlignment="Center" 
-                Margin="20,0,73,0" Grid.ColumnSpan="2" Height="16"
-            />
-            <DataGrid 
-                  Grid.Row="1"   
-                  Grid.ColumnSpan="4"
-                  Margin="20,1,39,34"
-                  CanUserAddRows="False"
-                  CanUserDeleteRows="False"
-                  ItemsSource="{Binding AudioFiles}"
-                  SelectedItem="{Binding SelectedAudio}"
-                  CanUserReorderColumns="False"
-                  AutoGenerateColumns="False"
-                  IsReadOnly="False"
-                  Grid.RowSpan="2">
+            
+            <!-- Project name and file controls -->
+            <Grid Grid.Row="0" Grid.Column="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                
+                <TextBlock Text="Project:" Margin="5,10,5,10" VerticalAlignment="Center" FontWeight="Bold"/>
+                <TextBox Grid.Column="1" Text="{Binding ProjectName}" Margin="5,5,5,5"/>
+                <Button Grid.Column="2" Content="Add Files" Command="{Binding AddFilesCommand}"/>
+                <Button Grid.Column="3" Content="Remove File" Command="{Binding DeleteCommand}"/>
+            </Grid>
+            
+            <!-- Audio Files DataGrid -->
+            <DataGrid Grid.Row="1" Grid.Column="0"
+                      Margin="0,10,10,0"
+                      CanUserAddRows="False"
+                      CanUserDeleteRows="False"
+                      ItemsSource="{Binding AudioFiles}"
+                      SelectedItem="{Binding SelectedAudio}"
+                      CanUserReorderColumns="False"
+                      AutoGenerateColumns="False"
+                      IsReadOnly="False"
+                      HeadersVisibility="Column">
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="File Name"
-                                    Binding="{Binding FileName}"
-                                    Width="1*"></DataGridTextColumn>
+                                        Binding="{Binding FileName}"
+                                        Width="2*"/>
                     <DataGridTextColumn Header="HeadRoom"
-                                    Binding="{Binding Headroom}"
-                                    Width="1*"></DataGridTextColumn>
+                                        Binding="{Binding Headroom}"
+                                        Width="*"/>
                     <DataGridTextColumn Header="PlayBegin"
-                                    Binding="{Binding PlayBegin}"
-                                    Width="1*"></DataGridTextColumn>
+                                        Binding="{Binding PlayBegin}"
+                                        Width="*"/>
                     <DataGridTextColumn Header="PlayEnd"
-                                    Binding="{Binding PlayEnd}"
-                                    Width="1*"></DataGridTextColumn>
+                                        Binding="{Binding PlayEnd}"
+                                        Width="*"/>
                     <DataGridTextColumn Header="LoopBegin"
-                                    Binding="{Binding LoopBegin}"
-                                    Width="1*"></DataGridTextColumn>
+                                        Binding="{Binding LoopBegin}"
+                                        Width="*"/>
                     <DataGridTextColumn Header="LoopEnd"
-                                    Binding="{Binding LoopEnd}"
-                                    Width="1*"></DataGridTextColumn>
+                                        Binding="{Binding LoopEnd}"
+                                        Width="*"/>
                     <DataGridTextColumn Header="LoopPoint"
-                                    Binding="{Binding LoopPoint}"
-                                    Width="1*"></DataGridTextColumn>
+                                        Binding="{Binding LoopPoint}"
+                                        Width="*"/>
                     <DataGridTextColumn Header="Peak"
-                                    Binding="{Binding Peak}"
-                                    Width="1*"></DataGridTextColumn>
+                                        Binding="{Binding Peak}"
+                                        Width="*"/>
                     <DataGridTextColumn Header="Volume"
-                                    Binding="{Binding Volume, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                    Width="1*"></DataGridTextColumn>
+                                        Binding="{Binding Volume, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                        Width="*"/>
                 </DataGrid.Columns>
             </DataGrid>
-            <Button 
-                Grid.Column="1"
-                Grid.Row="2"
-                Content="Remove File"
-                Command="{Binding DeleteCommand}" Margin="184,4,234,3" Grid.ColumnSpan="3" />
-            <Button Grid.Row="2"
-                Grid.Column="3"
-                Content="Build Resource"
-                Command="{Binding ExportCommand}" Margin="246,4,24,3" RenderTransformOrigin="0.892,0.602" Grid.ColumnSpan="2"/>
-            <Button
-                Grid.Row="2"
-                Grid.Column="0"
-                Content="Select Files"
-                Command="{Binding AddFilesCommand}" Margin="20,4,42,3"/>
-            <TextBox Grid.Column="4" HorizontalAlignment="Left" Margin="4,13,0,0" Grid.Row="1" TextWrapping="Wrap" Text="{Binding SoundSetName}" VerticalAlignment="Top" Width="120"/>
-            <Label Grid.Column="4" Content="Soundset Name" HorizontalAlignment="Left" Margin="13,20,0,0" VerticalAlignment="Top" Grid.RowSpan="2"/>
-            <TextBox Grid.Column="4" HorizontalAlignment="Left" Margin="4,59,0,0" Grid.Row="1" TextWrapping="Wrap" Text="{Binding AudioBankName}" VerticalAlignment="Top" Width="120"/>
-            <Label Grid.Column="4" Content="Audiobank Name" HorizontalAlignment="Left" Margin="13,36,0,0" VerticalAlignment="Top" Grid.Row="1"/>
-            <TextBox Grid.Column="4" HorizontalAlignment="Left" Margin="4,197,0,0" Grid.Row="1" TextWrapping="Wrap" Text="{Binding OutputPath}" IsReadOnly="True" VerticalAlignment="Top" Width="120"/>
-            <Button Grid.Column="4" Command="{Binding OutputFolderCommand}" Content="Set Output Folder" HorizontalAlignment="Left" Margin="9,328,0,0" Grid.Row="1" VerticalAlignment="Top"/>
-            <Label Grid.Column="4" Content="Output Path" HorizontalAlignment="Left" Margin="24,0,0,0" VerticalAlignment="Center" Grid.Row="1"/>
-
-
-
+            
+            <!-- Project Settings Panel -->
+            <Border Grid.Row="0" Grid.RowSpan="2" Grid.Column="1" 
+                    Background="White" 
+                    CornerRadius="8" 
+                    Margin="5" 
+                    Padding="15" 
+                    BorderBrush="#dcdde1" 
+                    BorderThickness="1">
+                <StackPanel>
+                    <TextBlock Text="Project Settings" FontWeight="Bold" FontSize="16" Margin="0,0,0,15"/>
+                    
+                    <TextBlock Text="Soundset Name" Margin="0,5,0,2"/>
+                    <TextBox Text="{Binding SoundSetName}"/>
+                    
+                    <TextBlock Text="Audiobank Name" Margin="0,15,0,2"/>
+                    <TextBox Text="{Binding AudioBankName}"/>
+                    
+                    <TextBlock Text="Output Path" Margin="0,15,0,2"/>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBox Grid.Column="0" Text="{Binding OutputPath}" IsReadOnly="True"/>
+                        <Button Grid.Column="1" Content="Browse" Command="{Binding OutputFolderCommand}" Margin="5,5,0,5"/>
+                    </Grid>
+                    
+                    <TextBlock Text="Supported Formats" Margin="0,15,0,5" FontWeight="Bold"/>
+                    <TextBlock Text="{Binding SupportedFormatsText}" TextWrapping="Wrap"/>
+                    
+                    <Button Content="Build Resource" 
+                            Command="{Binding ExportCommand}" 
+                            Margin="0,30,0,0" 
+                            Background="#2ecc71" 
+                            Height="40"/>
+                </StackPanel>
+            </Border>
+            
+            <!-- Status bar -->
+            <Border Grid.Row="2" Grid.ColumnSpan="2" 
+                    Background="#ecf0f1" 
+                    Padding="10,5" 
+                    Margin="0,10,0,0"
+                    CornerRadius="4">
+                <TextBlock Text="Created by JericoFX" Foreground="#7f8c8d" HorizontalAlignment="Right"/>
+            </Border>
         </Grid>
     </DockPanel>
 </Window>

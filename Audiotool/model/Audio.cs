@@ -12,14 +12,14 @@ public struct Marker
 public class Audio
 {
     // Audio information
-    public string FilePath { get; set; }
+    public string FilePath { get; set; } = string.Empty;
     public ulong FileSize { get; set; }
-    public string FileName { get; set; }
+    public string FileName { get; set; } = string.Empty;
     public TimeSpan Duration { get; set; }
     public int Samples { get; set; }
     public int SampleRate { get; set; }
-    public string FileExtension { get; set; }
-    public string Codec { get; set; }
+    public string FileExtension { get; set; } = string.Empty;
+    public string Codec { get; set; } = string.Empty;
     public int Channels { get; set; }
     
     // Audio settings

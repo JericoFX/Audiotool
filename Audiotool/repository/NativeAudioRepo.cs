@@ -16,6 +16,11 @@ public class NativeAudioRepo
 
     public async Task AddAudioFile(string path)
     {
+        if (!WavConverter.IsFormatSupported(path))
+        {
+            throw new Exception($"Unsupported audio format. Supported formats: {string.Join(", ", WavConverter.SupportedFormats)}");
+        }
+        
         IMediaAnalysis info = await FFProbe.AnalyseAsync(path);
         if (info.PrimaryAudioStream == null)
         {
@@ -24,7 +29,7 @@ public class NativeAudioRepo
 
         string filename = Path.GetFileNameWithoutExtension(path);
 
-        Audio currentAudioFile = AudioFiles.FirstOrDefault(a => a.FileName == filename);
+        Audio? currentAudioFile = AudioFiles.FirstOrDefault(a => a.FileName == filename);
 
         if (currentAudioFile != null) return;
 
@@ -33,7 +38,7 @@ public class NativeAudioRepo
             Codec = "ADPCM",
             FilePath = path,
             FileName = filename,
-            FileExtension = Path.GetExtension(path),
+            FileExtension = Path.GetExtension(path).ToLowerInvariant(),
             Samples = (int)Math.Round(info.Duration.TotalSeconds * info.PrimaryAudioStream.SampleRateHz),
             SampleRate = info.PrimaryAudioStream.SampleRateHz,
             Duration = info.Duration,
@@ -113,5 +118,29 @@ public class NativeAudioRepo
 
         MessageBox.Show("Resource has been build!");
     }
-
+    
+    public ProjectState GetProjectState(string soundSetName, string audioBankName, string outputPath)
+    {
+        return new ProjectState
+        {
+            SoundSetName = soundSetName,
+            AudioBankName = audioBankName,
+            OutputPath = outputPath,
+            AudioFiles = new List<Audio>(AudioFiles),
+            IsModified = true
+        };
+    }
+    
+    public void LoadProjectState(ProjectState project)
+    {
+        AudioFiles.Clear();
+        foreach (var audio in project.AudioFiles)
+        {
+            // Skip files that no longer exist
+            if (File.Exists(audio.FilePath))
+            {
+                AudioFiles.Add(audio);
+            }
+        }
+    }
 }
